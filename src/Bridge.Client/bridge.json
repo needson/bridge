@@ -1,0 +1,17 @@
+{
+    "Nodes": [
+        {
+            "Type": "JsonInput",
+            "Name": "JsonInput01",
+            "Inputs": [
+                {
+                    "Name": "Json",
+                    "Value": {
+                        "Type": "Data",
+                        "Data": ""
+                    }
+                }
+            ]
+        }
+    ]
+}

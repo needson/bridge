@@ -1,9 +1,35 @@
 ﻿namespace Bridge.Client;
 
-internal class Program
+internal static class Program
 {
-    static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
+        const string json = """
+           {
+            "Name": "Alex",
+            "Initials": "AN",
+            "DateOfBirth": "13-05-1988"
+           }
+           """;
+
+        var bridgeBuilder = new BridgeBuilder();
+        
+        var bridge = bridgeBuilder
+            .Configure(configuration =>
+            {
+                configuration.NodeConfigurationPath = "bridge.json";
+            })
+            .Build();
+        
+        var jsonInputNode = bridge.GetNode<JsonInputNode>("JsonInput01");
+        var jsonOutputNode = bridge.GetNode<JsonOutputNode>("JsonOutputNode01");
+
+        jsonInputNode.SetInput(x => x.Json, json);
+
+        await bridge.Run();
+        
+        var jsonOutput = jsonOutputNode.GetOutput(x => x.Json);
+
+        Console.WriteLine(jsonOutput);
     }
 }
