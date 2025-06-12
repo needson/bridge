@@ -6,8 +6,7 @@ public class Bridge
     {
     }
 
-    public T GetNode<T>(string name) where T : BridgeNode
+    public void Start()
     {
-        return new JsonInputNode();
     }
 }

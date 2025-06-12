@@ -1,28 +1,31 @@
-﻿using System.Linq.Expressions;
-
-namespace Bridge.Client;
+﻿namespace Bridge.Client;
 
 public abstract class BridgeNode
 {
 }
 
-public abstract class BridgeNode<TInputs> : BridgeNode
+public abstract class BridgeNode<TInputs, TOutputs> : BridgeNode
     where TInputs : BridgeNodeInputs
 {
-    public void SetInput<T>(Expression<Func<TInputs, T>> inputSelector, T inputValue)
+    public void RegisterInputsSource(Func<TInputs> inputsSource)
     {
     }
 
-    public T GetOutput<T>(Expression<Func<TInputs, T>> outputSelector)
+    public void RegisterOutputsListener(Action<TOutputs> outputsListener)
     {
     }
 }
 
-public class JsonInputNode : BridgeNode<JsonInputNodeInputs>
+public class JsonInputNode :
+    BridgeNode<JsonInputNodeInputs, JsonInputNodeOutputs>
 {
 }
 
 public abstract class BridgeNodeInputs
+{
+}
+
+public abstract class BridgeNodeOutputs
 {
 }
 
@@ -31,11 +34,21 @@ public class JsonInputNodeInputs : BridgeNodeInputs
     public string Json { get; set; }
 }
 
-public class JsonOutputNode : BridgeNode<JsonOutputNodeOutputs>
+public class JsonInputNodeOutputs : BridgeNodeOutputs
 {
 }
 
-public class JsonOutputNodeOutputs : BridgeNodeInputs
+public class JsonOutputNode :
+    BridgeNode<JsonOutputNodeInputs, JsonOutputNodeOutputs>
+{
+}
+
+public class JsonOutputNodeInputs : BridgeNodeInputs
+{
+    public string Json { get; set; }
+}
+
+public class JsonOutputNodeOutputs : BridgeNodeOutputs
 {
     public string Json { get; set; }
 }

@@ -1,35 +1,47 @@
-﻿namespace Bridge.Client;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Serilog;
+
+namespace Bridge.Client;
 
 internal static class Program
 {
     public static async Task Main(string[] args)
     {
-        const string json = """
-           {
-            "Name": "Alex",
-            "Initials": "AN",
-            "DateOfBirth": "13-05-1988"
-           }
-           """;
-
-        var bridgeBuilder = new BridgeBuilder();
-        
-        var bridge = bridgeBuilder
-            .Configure(configuration =>
-            {
-                configuration.NodeConfigurationPath = "bridge.json";
-            })
+        var configuration = new ConfigurationBuilder()
+            .SetupConfiguration(args)
             .Build();
-        
-        var jsonInputNode = bridge.GetNode<JsonInputNode>("JsonInput01");
-        var jsonOutputNode = bridge.GetNode<JsonOutputNode>("JsonOutputNode01");
 
-        jsonInputNode.SetInput(x => x.Json, json);
+        var host = Host.CreateDefaultBuilder(args)
+            .ConfigureServices(services => services.SetupServices(configuration))
+            .Build();
 
-        await bridge.Run();
-        
-        var jsonOutput = jsonOutputNode.GetOutput(x => x.Json);
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(configuration)
+            .Enrich.FromLogContext()
+            .WriteTo.Console()
+            .CreateLogger();
 
-        Console.WriteLine(jsonOutput);
+        var startup = ActivatorUtilities.CreateInstance<Startup>(host.Services);
+        await startup.Run();
+
+        Console.ReadLine();
+    }
+
+    private static IConfigurationBuilder SetupConfiguration(
+        this IConfigurationBuilder builder, string[] args)
+    {
+        return builder
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddCommandLine(args)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+    }
+
+    private static IServiceCollection SetupServices(
+        this IServiceCollection services, IConfiguration configuration)
+    {
+        return services
+            .Configure<StartupOptions>(configuration.GetSection("Startup"));
     }
 }
