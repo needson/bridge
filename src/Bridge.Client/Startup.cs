@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Bridge.Client.Builder;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Bridge.Client;
@@ -20,8 +21,8 @@ internal class Startup
         {
             var bridge = new BridgeBuilder()
                 .ReadConfiguration.FromJsonFile(_options.BridgeConfigurationFile)
-                .Start.FromNode<JsonInputNode>(_options.BridgeStartNodeName, ConfigureInputNode)
-                .Listen.ToNode<JsonOutputNode>(_options.BridgeResultNodeName, ConfigureOutputNode)
+                .Configure.Node<JsonInputNode>(_options.BridgeStartNodeName, ConfigureInputNode)
+                .Configure.Node<JsonOutputNode>(_options.BridgeResultNodeName, ConfigureOutputNode)
                 .Build();
 
             bridge.Start();
