@@ -1,4 +1,5 @@
 ﻿using Bridge.Client.Builder;
+using Bridge.Client.Domain;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -17,15 +18,19 @@ internal class Startup
 
     public Task Run()
     {
-        return Task.Factory.StartNew(() =>
+        return Task.Factory.StartNew(async () =>
         {
-            var bridge = new BridgeBuilder()
-                .ReadConfiguration.FromJsonFile(_options.BridgeConfigurationFile)
-                .Configure.Node<JsonInputNode>(_options.BridgeStartNodeName, ConfigureInputNode)
-                .Configure.Node<JsonOutputNode>(_options.BridgeResultNodeName, ConfigureOutputNode)
-                .Build();
+            //var bridge = new BridgeBuilder()
+            //    .ReadConfiguration.FromJsonFile(_options.BridgeConfigurationFile)
+            //    .Configure.Node<JsonInputNode>(_options.BridgeStartNodeName, ConfigureInputNode)
+            //    .Configure.Node<JsonOutputNode>(_options.BridgeResultNodeName, ConfigureOutputNode)
+            //    .Build();
 
-            bridge.Start();
+            //bridge.Start();
+            var outputNode = new OutputNode();
+            var inputNode = new InputNode();
+
+            _ = new Connection(outputNode.Connector, inputNode.Connector);
         });
     }
 
