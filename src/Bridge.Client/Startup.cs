@@ -27,10 +27,14 @@ internal class Startup
             //    .Build();
 
             //bridge.Start();
+
             var outputNode = new OutputNode();
             var inputNode = new InputNode();
 
-            _ = new Connection(outputNode.Connector, inputNode.Connector);
+            var connection = new Connection();
+
+            await inputNode.Connector.Connect(connection);
+            await outputNode.Connector.Connect(connection);
         });
     }
 

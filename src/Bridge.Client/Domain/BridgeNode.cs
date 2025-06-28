@@ -1,4 +1,5 @@
-﻿using System.Reactive.Linq;
+﻿using Bridge.Client.Domain.Connectors;
+using System.Reactive.Linq;
 
 namespace Bridge.Client.Domain;
 
@@ -9,7 +10,7 @@ public class BridgeConnectorValue
 
 public class InputNode
 {
-    public Connector Connector => Connector.Create(Handler);
+    public Connector Connector => InputConnector.Create(Handler);
 
     private static void Handler(BridgeConnectorValue input)
     {
@@ -19,14 +20,14 @@ public class InputNode
 
 public class OutputNode
 {
-    public Connector Connector => Connector.Create(Output);
+    public Connector Connector => OutputConnector.Create(Output);
 
-    public IObservable<BridgeConnectorValue> Output
+    private static IObservable<BridgeConnectorValue> Output
         => Observable
             .Interval(TimeSpan.FromSeconds(1))
             .Select(_ => Produce());
 
-    public BridgeConnectorValue Produce()
+    private static BridgeConnectorValue Produce()
     {
         return new BridgeConnectorValue { Value = $"Current time is {DateTime.Now}" };
     }
